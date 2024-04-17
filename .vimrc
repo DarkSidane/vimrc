@@ -17,6 +17,7 @@ Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plug 'jparise/vim-graphql'
 Plug 'yuratomo/w3m.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'preservim/nerdtree'
 
 let g:coc_global_extensions = [
   \ 'coc-tsserver'
@@ -58,9 +59,6 @@ endfunction
 " Mappage de la touche Entrée en mode normal
 nnoremap <CR> :call SaveAndRunPython()<CR>
 
-autocmd WinNew * wincmd L " Split windows to the right
-au VimLeave * :!clear " Clear the terminal when leaving vim
-
 let g:EasyMotion_do_mapping = 0 " Disable default mappings
 
 " Turn on case-insensitive feature
@@ -74,6 +72,11 @@ map  <Leader>f <Plug>(easymotion-bd-f)
 nmap <Leader>f <Plug>(easymotion-overwin-f)
 "nnoremap <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar><CR>
  autocmd BufWinEnter *.py nmap <silent> <F5>:w<CR>:terminal python3 -m pdb '%:p'<CR> 
+
+noremap <F1> <C-W>
+" Nerd tree
+nnoremap <F2> :NERDTreeToggle<CR>
+
 
 let g:lsp_settings = {
 \   'pylsp': {
