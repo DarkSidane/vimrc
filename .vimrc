@@ -1,58 +1,105 @@
-" Vundle configuration
-set nocompatible              " be iMproved, required
-filetype off                  " required
-"---------------------------------------------------------------------------"
+" useful keys : é, ù, £, §, ç 
+" é, ù, ç is used
+
 call plug#begin()
 Plug('VundleVim/Vundle.vim')
 Plug('tpope/vim-fugitive')
 Plug('michaeljsmith/vim-indent-object')
 "Plug('prabirshrestha/asyncomplete.vim')
-Plug 'prabirshrestha/vim-lsp'
-Plug 'mattn/vim-lsp-settings'
+"Plug 'prabirshrestha/vim-lsp'
+"Plug 'mattn/vim-lsp-settings'
 " For React : 
-Plug 'pangloss/vim-javascript'
-Plug 'leafgarland/typescript-vim'
-Plug 'peitalin/vim-jsx-typescript'
-Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
-Plug 'jparise/vim-graphql'
 Plug 'yuratomo/w3m.vim'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'preservim/nerdtree'
 
-let g:coc_global_extensions = [
-  \ 'coc-tsserver'
-  \ ]
 call plug#end()
+let g:NERDTreeQuitOnOpen = 1
 " You can revert the settings after the call like so:
 "   filetype indent off   " Disable file-type-specific indentation
 "   syntax off            " Disable syntax highlighting
 "Plugin
 syntax on 
+" for auto save after the buffer leaved
+set autowrite
+set cursorcolumn cursorline
+"hi CursorLine cterm=NONE ctermbg=darkred ctermfg=white
+"hi CursorColumn cterm=NONE ctermbg=darkred ctermfg=white
 "---------------------------------------------------------------------------"
+"
 set clipboard=unnamed
-let mapleader=" "
-noremap <F13> <C-w>
-"---------------------------------------------------------------------------"
-"Entrée lance un test python
-function! SaveAndRunPython()
-    " Vérifie si le fichier courant est un fichier Python
-    if &filetype == 'python'
-        " Sauvegarde le fichier
-        write
-	clear
-        " Exécute le fichier Python courant
-	!pytest -rP %
-        " Simule simplement un appui sur Entrée dans le cas contraire
-        execute "normal! \<CR>"
-    elseif &filetype == 'yml' || &filetype == 'yaml'
-        " Sauvegarde le fichier
-        write
-	8clear
-        " Exécute le fichier Python courant
-        !yq %
+map é :tabe<CR>
+map ù <leader>
+map ùù <leader><leader>
+map ç :bd<CR>
+map ¥ <leader>
+map ¥¥ <leader><leader>
+noremap <space> <C-w>
+noremap <leader>v :e ~/.vimrc<CR>
+nnoremap <leader>d "=strftime("%d/%m/%y %H:%M:%S")<CR>P
+
+" CLINK REMAP 
+noremap <leader>a :e assets/elements/files/
+noremap <leader>l :e assets/lang/
+noremap <leader>t :e src/test_case/test/
+noremap <leader>p :e src/pages/
+noremap <leader>s :call Switch_lang_files()<CR>
+nnoremap <CR> :call SaveAndRunPython()<CR>
+nnoremap <Tab> :b 
+" nnoremap <Tab> :bnext<CR>
+" nnoremap <S-Tab> :bprevious<CR>
+set wildchar=<Tab> wildmenu wildmode=full
+function! LocalesComplete(lead, cmdline, cursorpos)
+    " Liste des locales pour toutes les régions
+    let locales = [
+    \ 'germany', 'switzerland', 'france', 'italy', 'united_arab_emirates', 'united_kingdom', 'england', 'japan', 'taiwan', 'china',
+    \ 'belgium', 'canada', 'mexico', 'singapore', 'hong_kong', 
+    \ ]
+    " Filtrer les locales en fonction du préfixe entré par l'utilisateur
+    return filter(copy(locales), 'v:val =~ "^" . a:lead')
+endfunction
+
+function! Switch_lang_files()
+    let locales = [
+    \ 'germany', 'switzerland', 'france', 'italy', 'united_arab_emirates', 'united_kingdom', 'england', 'japan', 'taiwan', 'china',
+    \ 'belgium', 'canada', 'mexico', 'singapore', 'hong_kong', 
+    \ ]
+    let userLocale = input('Entrez un pays (ex: france): ', '', 'customlist,LocalesComplete')
+    if index(locales, userLocale) != -1
+        let currentFilePath = expand('%:p')
+        let regionPath = 'test'
+        if index(['japan', 'taiwan', 'hong_kong', 'china', 'singapore'], userLocale) >= 0
+            let regionPath = 'APAC'
+        elseif index(['mexico', 'canada'], userLocale) >= 0
+            let regionPath = 'AMER'
+        elseif index(['france', 'italy', 'germany', 'switzerland', 'united_kingdom', 'belgium'], userLocale) >= 0
+            let regionPath = 'EMEA'
+        endif
+        let newPath = substitute(currentFilePath, 'src/test_case/test/', 'src/test_case/'.regionPath.'/'.userLocale.'/custom/', '')
+	let dirPath = fnamemodify(newPath, ':h')
+	call mkdir(dirPath, 'p')
+	execute 'edit ' . newPath
     else
-        " Simule simplement un appui sur Entrée dans le cas contraire
-        execute "normal! \<CR>"
+        echo 'Pays non reconnu ou non supporté.'
+    endif
+endfunction
+" Lier la fonction à une commande pour faciliter son utilisation
+function! SaveAndRunPython()
+    wa
+    if &filetype == 'python'
+        clear
+        if matchstr(expand('%:t'), '^test') != ''
+            !pytest -rP %
+        else
+            !python3 %
+        endif
+    elseif &filetype == 'yml' || &filetype == 'yaml'
+        clear
+        !yq %
+    elseif &filetype == 'html'
+        !open -a firefox %
+    elseif &filetype == 'cpp'
+        !g++ -o %< % && ./%<
+    else
     endif
 endfunction
 "---------------------------------------------------------------------------"
@@ -91,11 +138,3 @@ let g:lsp_settings = {
 \     }
 \   },
 \}
-
-" VIM GPT
-let g:chat_gpt_max_tokens=2000
-let g:chat_gpt_model='gpt-4-turbo-preview'
-let g:chat_gpt_session_mode=0
-let g:chat_gpt_temperature = 0.7
-let g:chat_gpt_lang = 'English'
-let g:chat_gpt_split_direction = 'vertical'
