@@ -5,6 +5,8 @@ call plug#begin()
 Plug('VundleVim/Vundle.vim')
 Plug('tpope/vim-fugitive')
 Plug('michaeljsmith/vim-indent-object')
+Plug 'madox2/vim-ai'
+Plug 'skywind3000/vim-gpt-commit'
 "Plug('prabirshrestha/asyncomplete.vim')
 "Plug 'prabirshrestha/vim-lsp'
 "Plug 'mattn/vim-lsp-settings'
@@ -28,12 +30,10 @@ set cursorcolumn cursorline
 "
 set clipboard=unnamed
 map é :tabe<CR>
-map ù <leader>
-map ùù <leader><leader>
+map <space> <leader>
+map <space><space> <leader><leader>
 map ç :bd<CR>
-map ¥ <leader>
-map ¥¥ <leader><leader>
-noremap <space> <C-w>
+noremap ù <C-w>
 noremap <leader>v :e ~/.vimrc<CR>
 nnoremap <leader>d "=strftime("%d/%m/%y %H:%M:%S")<CR>P
 
@@ -44,7 +44,7 @@ noremap <leader>t :e src/test_case/test/
 noremap <leader>p :e src/pages/
 noremap <leader>s :call Switch_lang_files()<CR>
 nnoremap <CR> :call SaveAndRunPython()<CR>
-nnoremap <Tab> :b 
+nnoremap <Tab> :ls<CR>:b 
 " nnoremap <Tab> :bnext<CR>
 " nnoremap <S-Tab> :bprevious<CR>
 set wildchar=<Tab> wildmenu wildmode=full
@@ -71,7 +71,7 @@ function! Switch_lang_files()
             let regionPath = 'APAC'
         elseif index(['mexico', 'canada'], userLocale) >= 0
             let regionPath = 'AMER'
-        elseif index(['france', 'italy', 'germany', 'switzerland', 'united_kingdom', 'belgium'], userLocale) >= 0
+        elseif index(['france', 'italy', 'germany', 'switzerland', 'united_kingdom', 'belgium', 'united_arab_emirates'], userLocale) >= 0
             let regionPath = 'EMEA'
         endif
         let newPath = substitute(currentFilePath, 'src/test_case/test/', 'src/test_case/'.regionPath.'/'.userLocale.'/custom/', '')
